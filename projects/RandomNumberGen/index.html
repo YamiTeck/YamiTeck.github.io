@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Generator</title>
+    <style>
+        #history {
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Random Number Generator</h1>
+    <label for="min">Min:</label>
+    <input type="number" id="min" value="1">
+    <label for="max">Max:</label>
+    <input type="number" id="max" value="100">
+    <button onclick="generateRandomNumber()">Generate</button>
+    <p id="result">Your random number will appear here.</p>
+
+    <div id="history">
+        <h3>History:</h3>
+        <ul id="historyList"></ul>
+    </div>
+
+    <label for="customText">Add a comment here:</label>
+    <input type="text" id="customText" placeholder="Enter your comment here">
+    <button onclick="exportHistory()">Save & Export</button>
+
+    <script>
+        function generateRandomNumber() {
+            const min = parseInt(document.getElementById('min').value);
+            const max = parseInt(document.getElementById('max').value);
+
+            if (isNaN(min) || isNaN(max) || min >= max) {
+                document.getElementById('result').textContent = "Please enter valid numbers, with Min < Max.";
+                return;
+            }
+
+            const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById('result').textContent = `Random Number: ${randomNumber}`;
+
+            // Get the current date and time
+            const now = new Date();
+            const timestamp = now.toLocaleString();
+
+            // Add the random number with a timestamp to history
+            const historyList = document.getElementById('historyList');
+            const listItem = document.createElement('li');
+            listItem.textContent = `${randomNumber} (Generated at: ${timestamp})`;
+            historyList.appendChild(listItem);
+        }
+
+        function exportHistory() {
+            // Get the custom text
+            const customText = document.getElementById('customText').value;
+
+            // Get the history items
+            const historyList = document.getElementById('historyList');
+            const historyItems = Array.from(historyList.getElementsByTagName('li')).map(item => item.textContent);
+
+            // Combine custom text with history items
+            const content = `${customText}\n\nHistory of Generated Numbers:\n` + historyItems.join('\n');
+
+            // Create a Blob and download it as a text file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'RandomNumberHistory.txt';
+            a.click();
+            URL.revokeObjectURL(url); // Clean up the URL object
+        }
+    </script>
+</body>
+</html>
